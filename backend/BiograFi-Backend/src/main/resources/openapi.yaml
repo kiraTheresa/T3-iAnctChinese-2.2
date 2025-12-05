@@ -1,0 +1,1356 @@
+openapi: 3.0.1
+info:
+  title: BiograFi-Backend API
+  description: 用户管理与文档标注系统后端API
+  version: 1.0.0
+servers:
+  - url: http://localhost:8080
+    description: 开发服务器
+paths:
+  /api/health:
+    get:
+      summary: 健康检查
+      description: 检查服务状态和数据库连接
+      responses:
+        '200':
+          description: 服务正常
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: ok
+                  service:
+                    type: string
+                    example: User Management Server (Spring Boot + MySQL)
+                  database:
+                    type: string
+                    example: connected
+                  timestamp:
+                    type: string
+                    format: date-time
+                    example: 2024-01-01T12:00:00.000Z
+
+  /api/login:
+    post:
+      summary: 用户登录
+      description: 用户登录接口
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserLoginRequest'
+      responses:
+        '200':
+          description: 登录成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponseUser'
+        '401':
+          description: 登录失败
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponseError'
+
+  /api/register:
+    post:
+      summary: 用户注册
+      description: 用户注册接口
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserRegisterRequest'
+      responses:
+        '201':
+          description: 注册成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponseUser'
+        '400':
+          description: 注册失败
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponseError'
+
+  /api/users/{userId}:
+    patch:
+      summary: 更新用户信息
+      description: 更新用户信息接口
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserUpdateRequest'
+      responses:
+        '200':
+          description: 更新成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponseUser'
+        '400':
+          description: 更新失败
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponseError'
+
+    get:
+      summary: 获取用户详情
+      description: 获取指定用户详情
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: 获取成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponseUser'
+        '404':
+          description: 用户不存在
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponseError'
+
+  /api/users:
+    get:
+      summary: 获取所有用户
+      description: 获取所有用户列表
+      responses:
+        '200':
+          description: 获取成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponseUserList'
+
+  /api/projects:
+    get:
+      summary: 获取用户项目列表
+      description: 获取指定用户的项目列表
+      parameters:
+        - name: userId
+          in: query
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: 获取成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponseProjectList'
+
+    post:
+      summary: 创建项目
+      description: 创建新项目
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProjectCreateRequest'
+      responses:
+        '201':
+          description: 创建成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponseProject'
+        '400':
+          description: 创建失败
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponseError'
+
+  /api/projects/{projectId}:
+    put:
+      summary: 更新项目
+      description: 更新项目信息
+      parameters:
+        - name: projectId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProjectUpdateRequest'
+      responses:
+        '200':
+          description: 更新成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponseProject'
+        '400':
+          description: 更新失败
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponseError'
+
+    delete:
+      summary: 删除项目
+      description: 删除指定项目
+      parameters:
+        - name: projectId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 删除成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponseVoid'
+        '400':
+          description: 删除失败
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponseError'
+
+    get:
+      summary: 获取项目详情
+      description: 获取指定项目详情
+      parameters:
+        - name: projectId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 获取成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponseProject'
+        '404':
+          description: 项目不存在
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponseError'
+
+  /api/documents:
+    get:
+      summary: 获取用户文档列表
+      description: 获取指定用户的文档列表，可按项目筛选
+      parameters:
+        - name: userId
+          in: query
+          required: true
+          schema:
+            type: integer
+        - name: projectId
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 获取成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponseDocumentList'
+
+    post:
+      summary: 创建文档
+      description: 创建新文档
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DocumentCreateRequest'
+      responses:
+        '201':
+          description: 创建成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponseDocument'
+        '400':
+          description: 创建失败
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponseError'
+
+  /api/documents/search:
+    get:
+      summary: 文档搜索
+      description: 搜索文档
+      parameters:
+        - name: userId
+          in: query
+          required: true
+          schema:
+            type: integer
+        - name: query
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: projectId
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 搜索成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponseDocumentList'
+
+  /api/documents/{documentId}:
+    get:
+      summary: 获取文档详情
+      description: 获取指定文档详情
+      parameters:
+        - name: documentId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 获取成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponseDocument'
+        '404':
+          description: 文档不存在
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponseError'
+
+    put:
+      summary: 更新文档
+      description: 更新文档信息
+      parameters:
+        - name: documentId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DocumentUpdateRequest'
+      responses:
+        '200':
+          description: 更新成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponseDocument'
+        '400':
+          description: 更新失败
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponseError'
+
+    delete:
+      summary: 删除文档
+      description: 删除指定文档
+      parameters:
+        - name: documentId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 删除成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponseVoid'
+        '400':
+          description: 删除失败
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponseError'
+
+  /api/documents/{documentId}/annotations:
+    get:
+      summary: 获取文档的实体标注列表
+      description: 获取指定文档的所有实体标注
+      parameters:
+        - name: documentId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 获取成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponseAnnotationList'
+
+  /api/documents/{documentId}/annotations/entity:
+    post:
+      summary: 添加实体标注
+      description: 为指定文档添加实体标注
+      parameters:
+        - name: documentId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AnnotationRequest'
+      responses:
+        '201':
+          description: 添加成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponseAnnotation'
+        '400':
+          description: 添加失败
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponseError'
+
+  /api/documents/{documentId}/annotations/entity/bulk:
+    post:
+      summary: 批量添加实体标注
+      description: 为指定文档批量添加实体标注
+      parameters:
+        - name: documentId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BatchAnnotationRequest'
+      responses:
+        '201':
+          description: 批量添加成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponseInsertedCount'
+        '400':
+          description: 批量添加失败
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponseError'
+
+  /api/documents/{documentId}/annotations/entity/{annotationId}:
+    delete:
+      summary: 删除实体标注
+      description: 删除指定文档的指定实体标注
+      parameters:
+        - name: documentId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: annotationId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: 删除成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponseVoid'
+        '400':
+          description: 删除失败
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponseError'
+
+  /api/annotations/search:
+    get:
+      summary: 搜索实体标注
+      description: 搜索实体标注
+      parameters:
+        - name: documentId
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: label
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: text
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 搜索成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponseAnnotationList'
+
+  /api/documents/{documentId}/annotations/count:
+    get:
+      summary: 根据标签统计实体标注数量
+      description: 根据标签统计指定文档的实体标注数量
+      parameters:
+        - name: documentId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 统计成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponseLabelCount'
+
+  /api/visualization/overview:
+    get:
+      summary: 获取可视化总览统计
+      description: 获取指定文档的可视化总览统计
+      parameters:
+        - name: documentId
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 获取成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponseVisualizationOverview'
+        '400':
+          description: 获取失败
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponseError'
+
+  /api/visualization/locations:
+    get:
+      summary: 获取地点可视化数据
+      description: 获取指定文档的地点可视化数据
+      parameters:
+        - name: documentId
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 获取成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponseLocations'
+        '400':
+          description: 获取失败
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponseError'
+
+  /api/visualization/relationships:
+    get:
+      summary: 获取人物关系图数据
+      description: 获取指定文档的人物关系图数据
+      parameters:
+        - name: documentId
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 获取成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponseRelationships'
+        '400':
+          description: 获取失败
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponseError'
+
+  /api/visualization/timeline:
+    get:
+      summary: 获取时间轴数据
+      description: 获取指定文档的时间轴数据
+      parameters:
+        - name: documentId
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 获取成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponseTimeline'
+        '400':
+          description: 获取失败
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponseError'
+
+  /api/export-documents:
+    post:
+      summary: 导出文档及标注
+      description: 导出选中文档及标注，生成下载记录
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExportRequest'
+      responses:
+        '201':
+          description: 导出成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponseExportResult'
+        '400':
+          description: 导出失败
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponseError'
+
+  /api/exports/{exportId}/{fileName}:
+    get:
+      summary: 下载导出文件
+      description: 下载导出的文件
+      parameters:
+        - name: exportId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: fileName
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 下载成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponseString'
+        '404':
+          description: 文件不存在
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponseError'
+
+  /api/visualization/locations/cache:
+    get:
+      summary: 查询地名坐标缓存
+      description: 查询地名坐标缓存
+      parameters:
+        - name: name
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 查询成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponseLocationGeocode'
+        '404':
+          description: 未找到缓存
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponseError'
+
+    post:
+      summary: 更新地名坐标缓存
+      description: 更新地名坐标缓存
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LocationCacheRequest'
+      responses:
+        '200':
+          description: 更新成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponseLocationGeocode'
+        '400':
+          description: 更新失败
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponseError'
+
+components:
+  schemas:
+    UserLoginRequest:
+      type: object
+      properties:
+        username:
+          type: string
+          example: zontiks
+        password:
+          type: string
+          example: 123456
+
+    UserRegisterRequest:
+      type: object
+      properties:
+        username:
+          type: string
+          example: newuser
+        password:
+          type: string
+          example: 123456
+        email:
+          type: string
+          example: newuser@example.com
+
+    UserUpdateRequest:
+      type: object
+      properties:
+        username:
+          type: string
+          example: updateduser
+        email:
+          type: string
+          example: updateduser@example.com
+
+    ProjectCreateRequest:
+      type: object
+      properties:
+        userId:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: 新项目
+        description:
+          type: string
+          example: 项目描述
+
+    ProjectUpdateRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          example: 更新后的项目名
+        description:
+          type: string
+          example: 更新后的项目描述
+
+    DocumentCreateRequest:
+      type: object
+      properties:
+        userId:
+          type: integer
+          example: 1
+        projectId:
+          type: string
+          example: proj123
+        name:
+          type: string
+          example: 新文档
+        description:
+          type: string
+          example: 文档描述
+        content:
+          type: string
+          example: 文档内容
+        author:
+          type: string
+          example: 作者
+
+    DocumentUpdateRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          example: 更新后的文档名
+        description:
+          type: string
+          example: 更新后的文档描述
+        content:
+          type: string
+          example: 更新后的文档内容
+        author:
+          type: string
+          example: 更新后的作者
+
+    AnnotationRequest:
+      type: object
+      properties:
+        start:
+          type: integer
+          example: 10
+        end:
+          type: integer
+          example: 15
+        label:
+          type: string
+          example: 人物
+        text:
+          type: string
+          example: 刘备
+
+    BatchAnnotationRequest:
+      type: object
+      properties:
+        annotations:
+          type: array
+          items:
+            $ref: '#/components/schemas/AnnotationRequest'
+
+    ExportRequest:
+      type: object
+      properties:
+        documentIds:
+          type: array
+          items:
+            type: string
+          example: ["doc1", "doc2"]
+        exportFormat:
+          type: string
+          example: txt+csv
+
+    LocationCacheRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          example: 新地名
+        lng:
+          type: number
+          example: 116.4074
+        lat:
+          type: number
+          example: 39.9042
+        matchedName:
+          type: string
+          example: 北京
+        confidence:
+          type: string
+          example: high
+
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        username:
+          type: string
+          example: zontiks
+        email:
+          type: string
+          example: zontiks@example.com
+        createdAt:
+          type: string
+          format: date-time
+          example: 2024-01-01T12:00:00.000Z
+        updatedAt:
+          type: string
+          format: date-time
+          example: 2024-01-01T12:00:00.000Z
+
+    Project:
+      type: object
+      properties:
+        id:
+          type: string
+          example: proj123
+        userId:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: 项目名
+        description:
+          type: string
+          example: 项目描述
+        createdAt:
+          type: string
+          format: date-time
+          example: 2024-01-01T12:00:00.000Z
+        updatedAt:
+          type: string
+          format: date-time
+          example: 2024-01-01T12:00:00.000Z
+
+    Document:
+      type: object
+      properties:
+        id:
+          type: string
+          example: doc123
+        userId:
+          type: integer
+          example: 1
+        projectId:
+          type: string
+          example: proj123
+        name:
+          type: string
+          example: 文档名
+        description:
+          type: string
+          example: 文档描述
+        content:
+          type: string
+          example: 文档内容
+        author:
+          type: string
+          example: 作者
+        createdAt:
+          type: string
+          format: date-time
+          example: 2024-01-01T12:00:00.000Z
+        updatedAt:
+          type: string
+          format: date-time
+          example: 2024-01-01T12:00:00.000Z
+
+    EntityAnnotation:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        documentId:
+          type: string
+          example: doc123
+        start:
+          type: integer
+          example: 10
+        end:
+          type: integer
+          example: 15
+        label:
+          type: string
+          example: 人物
+        text:
+          type: string
+          example: 刘备
+        createdAt:
+          type: string
+          format: date-time
+          example: 2024-01-01T12:00:00.000Z
+
+    LocationGeocode:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: 洛阳
+        lng:
+          type: number
+          example: 112.4540
+        lat:
+          type: number
+          example: 34.6197
+        matchedName:
+          type: string
+          example: 洛阳
+        confidence:
+          type: string
+          example: high
+        updatedAt:
+          type: string
+          format: date-time
+          example: 2024-01-01T12:00:00.000Z
+
+    VisualizationOverview:
+      type: object
+      properties:
+        totalChars:
+          type: integer
+          example: 1324
+        labelCounts:
+          type: object
+          additionalProperties:
+            type: integer
+          example:
+            人物: 18
+            地名: 12
+            时间: 7
+
+    ApiResponseUser:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          $ref: '#/components/schemas/User'
+
+    ApiResponseUserList:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/User'
+
+    ApiResponseProject:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          $ref: '#/components/schemas/Project'
+
+    ApiResponseProjectList:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Project'
+
+    ApiResponseDocument:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          $ref: '#/components/schemas/Document'
+
+    ApiResponseDocumentList:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Document'
+
+    ApiResponseAnnotation:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          $ref: '#/components/schemas/EntityAnnotation'
+
+    ApiResponseAnnotationList:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/EntityAnnotation'
+
+    ApiResponseLocationGeocode:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          $ref: '#/components/schemas/LocationGeocode'
+
+    ApiResponseVisualizationOverview:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          $ref: '#/components/schemas/VisualizationOverview'
+
+    ApiResponseLocations:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: array
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+                example: 洛阳
+              count:
+                type: integer
+                example: 4
+              coordinates:
+                type: array
+                items:
+                  type: number
+                example: [112.4540, 34.6197]
+              matchInfo:
+                type: object
+                properties:
+                  original:
+                    type: string
+                    example: 洛阳
+                  matched:
+                    type: string
+                    example: 洛阳
+                  confidence:
+                    type: string
+                    example: high
+                  type:
+                    type: string
+                    example: historical
+
+    ApiResponseRelationships:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: object
+          properties:
+            centerPerson:
+              type: string
+              example: 刘备
+            nodes:
+              type: array
+              items:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    example: 刘备
+                  name:
+                    type: string
+                    example: 刘备
+                  isCenter:
+                    type: boolean
+                    example: true
+                  frequency:
+                    type: integer
+                    example: 12
+            links:
+              type: array
+              items:
+                type: object
+                properties:
+                  source:
+                    type: string
+                    example: 刘备
+                  target:
+                    type: string
+                    example: 关羽
+                  strength:
+                    type: integer
+                    example: 4
+                  label:
+                    type: string
+                    example: 熟悉
+
+    ApiResponseTimeline:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: array
+          items:
+            type: object
+            properties:
+              index:
+                type: integer
+                example: 0
+              start:
+                type: integer
+                example: 132
+              end:
+                type: integer
+                example: 135
+              text:
+                type: string
+                example: 建安五年
+              normalizedTime:
+                type: string
+                example: 200
+              context:
+                type: string
+                example: ...刘备于建安五年起兵...
+
+    ApiResponseExportResult:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: object
+          properties:
+            exportId:
+              type: string
+              example: exp_123456
+            exportedFiles:
+              type: array
+              items:
+                type: object
+                properties:
+                  name:
+                    type: string
+                    example: 文档名称.txt
+                  url:
+                    type: string
+                    example: /api/exports/exp_123456/file1
+            exportCount:
+              type: integer
+              example: 2
+
+    ApiResponseInsertedCount:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: object
+          properties:
+            insertedCount:
+              type: integer
+              example: 2
+
+    ApiResponseLabelCount:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: object
+          additionalProperties:
+            type: integer
+          example:
+            人物: 18
+            地名: 12
+            时间: 7
+
+    ApiResponseString:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: string
+          example: 文件下载功能开发中，当前文件路径: /api/exports/exp_123456/file1
+
+    ApiResponseVoid:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: null
+
+    ApiResponseError:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        message:
+          type: string
+          example: 错误信息
