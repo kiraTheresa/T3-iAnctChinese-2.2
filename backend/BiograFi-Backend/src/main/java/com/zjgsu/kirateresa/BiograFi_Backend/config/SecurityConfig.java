@@ -17,18 +17,12 @@ public class SecurityConfig {
         http
             .csrf(csrf -> csrf.disable()) // 开发环境下禁用CSRF保护
             .authorizeHttpRequests(authorize -> authorize
-                // 允许公开访问的端点
-                .requestMatchers("/api/health").permitAll()
-                .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
-                .requestMatchers("/api/users/login", "/api/users/register").permitAll() // 允许登录和注册端点公开访问
-                // 其他API端点需要认证
-                .requestMatchers("/api/**").authenticated()
-                // 其他所有请求允许访问
+                // 开发环境下允许所有请求访问
                 .anyRequest().permitAll()
             )
-            // 配置表单登录（如果需要）
+            // 禁用表单登录
             .formLogin(form -> form.disable())
-            // 配置HTTP Basic认证（如果需要）
+            // 禁用HTTP Basic认证
             .httpBasic(httpBasic -> httpBasic.disable());
         
         return http.build();
