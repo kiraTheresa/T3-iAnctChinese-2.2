@@ -15,7 +15,7 @@ spring:
         web-allow-others: false
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: create
     show-sql: true
     properties:
       hibernate:
@@ -28,5 +28,7 @@ logging:
     root: INFO
     com.zjgsu.kirateresa: DEBUG
     org.springframework.web: DEBUG
+    org.springframework.orm.jpa: DEBUG
     org.hibernate.SQL: DEBUG
     org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+    org.hibernate.tool.hbm2ddl: DEBUG
