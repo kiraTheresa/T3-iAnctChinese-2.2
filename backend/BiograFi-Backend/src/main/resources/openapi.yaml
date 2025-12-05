@@ -1334,7 +1334,7 @@ components:
           example: true
         data:
           type: string
-          example: 文件下载功能开发中，当前文件路径: /api/exports/exp_123456/file1
+          example: "文件下载功能开发中，当前文件路径: /api/exports/exp_123456/file1"
 
     ApiResponseVoid:
       type: object
@@ -1343,7 +1343,9 @@ components:
           type: boolean
           example: true
         data:
-          type: null
+          type: object
+          nullable: true
+          example: null
 
     ApiResponseError:
       type: object
