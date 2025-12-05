@@ -762,6 +762,128 @@ paths:
               schema:
                 $ref: '#/components/schemas/ApiResponseError'
 
+  # AI 服务接口
+  /api/ai/analyze:
+    post:
+      summary: 文本分析
+      description: 对文本进行详细分析，包含字面意思、核心哲学思想和现实意义
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AiAnalyzeRequest'
+      responses:
+        '200':
+          description: 分析成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponseAiResponse'
+        '400':
+          description: 请求参数错误
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponseError'
+        '500':
+          description: 分析失败
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponseError'
+
+  /api/ai/qa:
+    post:
+      summary: 问答系统
+      description: 根据提供的文本回答用户问题
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AiQaRequest'
+      responses:
+        '200':
+          description: 问答成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponseAiResponse'
+        '400':
+          description: 请求参数错误
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponseError'
+        '500':
+          description: 问答失败
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponseError'
+
+  /api/ai/auto-annotate:
+    post:
+      summary: 自动标注
+      description: 使用 AI 对文本进行实体标注，识别人物、地名、时间、器物、概念
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AiAutoAnnotateRequest'
+      responses:
+        '200':
+          description: 自动标注成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponseAutoAnnotationResponse'
+        '400':
+          description: 请求参数错误
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponseError'
+        '500':
+          description: 自动标注失败
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponseError'
+
+  # 分词服务接口
+  /api/segment:
+    post:
+      summary: 文本分词
+      description: 对文本进行中文分词，返回每个词的起止位置
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SegmentRequest'
+      responses:
+        '200':
+          description: 分词成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponseSegmentResponse'
+        '400':
+          description: 请求参数错误
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponseError'
+        '500':
+          description: 分词失败
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponseError'
+
 components:
   schemas:
     UserLoginRequest:
@@ -1356,4 +1478,135 @@ components:
         message:
           type: string
           example: 错误信息
+
+    # AI 服务相关 Schema
+    AiAnalyzeRequest:
+      type: object
+      properties:
+        text:
+          type: string
+          example: "天下皆知美之为美，斯恶已；皆知善之为善，斯不善已。"
+        model:
+          type: string
+          example: "deepseek-chat"
+          nullable: true
+
+    AiQaRequest:
+      type: object
+      properties:
+        text:
+          type: string
+          example: "天下皆知美之为美，斯恶已；皆知善之为善，斯不善已。"
+        question:
+          type: string
+          example: "这句话的核心思想是什么？"
+        model:
+          type: string
+          example: "deepseek-chat"
+          nullable: true
+
+    AiAutoAnnotateRequest:
+      type: object
+      properties:
+        text:
+          type: string
+          example: "刘备在荆州会见诸葛亮，商议天下大事。"
+
+    AiResponse:
+      type: object
+      properties:
+        result:
+          type: string
+          example: "1. 字面意思：...\n2. 核心哲学思想：...\n3. 现实意义：..."
+
+    # 分词服务相关 Schema
+    SegmentRequest:
+      type: object
+      properties:
+        text:
+          type: string
+          example: "天下皆知美之为美"
+
+    SegmentToken:
+      type: object
+      properties:
+        text:
+          type: string
+          example: "天下"
+        start:
+          type: integer
+          example: 0
+        end:
+          type: integer
+          example: 2
+
+    SegmentResponse:
+      type: object
+      properties:
+        tokens:
+          type: array
+          items:
+            $ref: '#/components/schemas/SegmentToken'
+
+    # 自动标注相关 Schema
+    AutoAnnotationItem:
+      type: object
+      properties:
+        start:
+          type: integer
+          example: 0
+        end:
+          type: integer
+          example: 2
+        label:
+          type: string
+          example: "人物"
+        text:
+          type: string
+          example: "刘备"
+
+    AutoAnnotationResponse:
+      type: object
+      properties:
+        annotations:
+          type: array
+          items:
+            $ref: '#/components/schemas/AutoAnnotationItem'
+
+    # AI 服务相关 ApiResponse
+    ApiResponseAiResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: "分析成功"
+        data:
+          $ref: '#/components/schemas/AiResponse'
+
+    ApiResponseSegmentResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: "分词成功"
+        data:
+          $ref: '#/components/schemas/SegmentResponse'
+
+    ApiResponseAutoAnnotationResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: "自动标注成功"
+        data:
+          $ref: '#/components/schemas/AutoAnnotationResponse'
 
