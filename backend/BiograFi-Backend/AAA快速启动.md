@@ -26,9 +26,7 @@ mvn spring-boot:run
 
 项目启动后，访问以下地址验证是否正常运行：
 
-- 健康检查：http://localhost:5002/api/health
-- Swagger UI：http://localhost:5002/swagger-ui.html
-- API 文档：http://localhost:5002/v3/api-docs
+- 健康检查：http://localhost:5002/api/health 
 
 ## 默认测试账号
 
