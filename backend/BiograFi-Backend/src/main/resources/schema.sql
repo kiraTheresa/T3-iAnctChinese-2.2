@@ -4,10 +4,10 @@ CREATE TABLE IF NOT EXISTS users (
     username VARCHAR(20) NOT NULL UNIQUE,
     email VARCHAR(100) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
-    is_active TINYINT(1) DEFAULT 1 NOT NULL,
-    last_login_at DATETIME,
-    created_at DATETIME NOT NULL,
-    updated_at DATETIME NOT NULL
+    is_active BOOLEAN DEFAULT TRUE NOT NULL,
+    last_login_at TIMESTAMP,
+    created_at TIMESTAMP NOT NULL,
+    updated_at TIMESTAMP NOT NULL
 );
 
 -- 项目表
@@ -16,9 +16,9 @@ CREATE TABLE IF NOT EXISTS projects (
     user_id INT NOT NULL,
     name VARCHAR(255) NOT NULL,
     description TEXT,
-    created_at DATETIME NOT NULL,
-    updated_at DATETIME NOT NULL,
-    FOREIGN KEY (user_id) REFERENCES users(id)
+    created_at TIMESTAMP NOT NULL,
+    updated_at TIMESTAMP NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
 -- 文档表
@@ -28,12 +28,12 @@ CREATE TABLE IF NOT EXISTS documents (
     project_id VARCHAR(64),
     name VARCHAR(255) NOT NULL,
     description TEXT,
-    content LONGTEXT,
+    content CLOB,
     author VARCHAR(255),
-    created_at DATETIME NOT NULL,
-    updated_at DATETIME NOT NULL,
-    FOREIGN KEY (user_id) REFERENCES users(id),
-    FOREIGN KEY (project_id) REFERENCES projects(id),
+    created_at TIMESTAMP NOT NULL,
+    updated_at TIMESTAMP NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE SET NULL,
     INDEX idx_user_project (user_id, project_id)
 );
 
@@ -45,8 +45,8 @@ CREATE TABLE IF NOT EXISTS entity_annotations (
     end_index INT NOT NULL,
     label VARCHAR(50) NOT NULL,
     text_content TEXT,
-    created_at DATETIME NOT NULL,
-    FOREIGN KEY (document_id) REFERENCES documents(id),
+    created_at TIMESTAMP NOT NULL,
+    FOREIGN KEY (document_id) REFERENCES documents(id) ON DELETE CASCADE,
     INDEX idx_document_label (document_id, label, start_index)
 );
 
@@ -58,7 +58,6 @@ CREATE TABLE IF NOT EXISTS location_geocodes (
     lat DECIMAL(10,6),
     matched_name VARCHAR(255),
     confidence VARCHAR(10),
-    created_at DATETIME NOT NULL,
-    updated_at DATETIME NOT NULL,
-    CONSTRAINT unique_name UNIQUE (name)
+    created_at TIMESTAMP NOT NULL,
+    updated_at TIMESTAMP NOT NULL
 );
