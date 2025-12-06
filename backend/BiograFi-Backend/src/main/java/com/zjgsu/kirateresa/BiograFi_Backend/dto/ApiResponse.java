@@ -37,6 +37,18 @@ public class ApiResponse<T> {
     }
 
     /**
+     * 成功响应（带消息）
+     * @param message 成功消息
+     * @param data 响应数据
+     * @param <T> 数据类型
+     * @return 成功响应
+     */
+    public static <T> ApiResponse<T> success(String message, T data) {
+        // 注意：这里message参数暂时未使用，保留用于兼容现有代码
+        return new ApiResponse<>(true, data, null);
+    }
+
+    /**
      * 错误响应
      * @param error 错误信息
      * @param <T> 数据类型

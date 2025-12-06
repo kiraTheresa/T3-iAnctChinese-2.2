@@ -31,17 +31,17 @@ public class SegmentController {
     public ResponseEntity<ApiResponse<SegmentResponse>> segmentText(@RequestBody SegmentRequest request) {
         try {
             if (request.getText() == null || request.getText().isEmpty()) {
-                return ResponseEntity.badRequest().body(new ApiResponse<>(false, "请提供要分词的文本", null));
+                return ResponseEntity.badRequest().body(ApiResponse.error("请提供要分词的文本"));
             }
 
             var tokens = segmentService.segmentText(request.getText());
             SegmentResponse response = new SegmentResponse();
             response.setTokens(tokens);
             
-            return ResponseEntity.ok(new ApiResponse<>(true, "分词成功", response));
+            return ResponseEntity.ok(ApiResponse.success("分词成功", response));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new ApiResponse<>(false, "分词失败: " + e.getMessage(), null));
+                    .body(ApiResponse.error("分词失败: " + e.getMessage()));
         }
     }
 }

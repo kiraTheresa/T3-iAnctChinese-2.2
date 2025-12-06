@@ -8,7 +8,6 @@ import com.zjgsu.kirateresa.BiograFi_Backend.service.AiService;
 import okhttp3.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -39,23 +38,14 @@ public class AiServiceImpl implements AiService {
         }
 
         // 创建请求体
-        String requestBody = String.format("{
-            \"model\": \"%s\",
-            \"messages\": [
-                {
-                    \"role\": \"user\",
-                    \"content\": \"%s\" 
-                }
-            ],
-            \"temperature\": %f,
-            \"max_tokens\": %d,
-            \"top_p\": %f
-        }", 
-        model != null ? model : aiConfig.getDeepSeekModel(), 
-        prompt, 
-        aiConfig.getTemperature(), 
-        aiConfig.getMaxTokens(), 
-        aiConfig.getTopP());
+        String requestBody = String.format(
+            "{\"model\": \"%s\",\"messages\": [{\"role\": \"user\",\"content\": \"%s\"}],\"temperature\": %f,\"max_tokens\": %d,\"top_p\": %f}",
+            model != null ? model : aiConfig.getDeepSeekModel(),
+            prompt,
+            aiConfig.getTemperature(),
+            aiConfig.getMaxTokens(),
+            aiConfig.getTopP()
+        );
 
         // 创建请求
         Request request = new Request.Builder()
@@ -188,5 +178,18 @@ public class AiServiceImpl implements AiService {
         } catch (IOException e) {
             throw new RuntimeException("自动标注时出错: " + e.getMessage(), e);
         }
+    }
+
+    @Override
+    public String healthCheck() {
+        // 健康检查逻辑
+        if (aiConfig.getDeepSeekApiKey() == null || aiConfig.getDeepSeekApiKey().isEmpty()) {
+            return "未配置 DEEPSEEK_API_KEY";
+        }
+        
+        // 简单验证配置有效性
+        return String.format("配置正常，模型: %s, API URL: %s", 
+                aiConfig.getDeepSeekModel(), 
+                aiConfig.getDeepSeekApiUrl());
     }
 }

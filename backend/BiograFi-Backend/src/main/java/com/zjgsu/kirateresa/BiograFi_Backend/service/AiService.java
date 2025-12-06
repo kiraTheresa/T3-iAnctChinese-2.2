@@ -32,4 +32,10 @@ public interface AiService {
      * @return 标注结果列表
      */
     List<AutoAnnotationItem> autoAnnotate(String text);
+
+    /**
+     * 健康检查
+     * @return 服务状态
+     */
+    String healthCheck();
 }

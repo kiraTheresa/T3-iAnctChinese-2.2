@@ -19,16 +19,18 @@ public class SegmentServiceImpl implements SegmentService {
     @Override
     public List<SegmentToken> segmentText(String text) {
         // 使用精确模式分词
-        List<JiebaSegmenter.SegToken> segTokens = segmenter.process(text, JiebaSegmenter.SegMode.SEARCH);
+        List<String> segWords = segmenter.sentenceProcess(text);
 
         // 转换为自定义的分词结果格式
         List<SegmentToken> result = new ArrayList<>();
-        for (JiebaSegmenter.SegToken segToken : segTokens) {
+        int start = 0;
+        for (String word : segWords) {
             SegmentToken token = new SegmentToken();
-            token.setText(segToken.word);
-            token.setStart(segToken.startOffset);
-            token.setEnd(segToken.endOffset);
+            token.setText(word);
+            token.setStart(start);
+            token.setEnd(start + word.length());
             result.add(token);
+            start += word.length();
         }
 
         return result;
